@@ -1,0 +1,22 @@
+{
+  "boss": true,
+  "browser": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "strict": false,
+  "validthis": true,
+  "sub": true,
+  "trailing": true,
+  "undef": false,
+  "unused": false,
+  "globals": {
+    "jQuery": true,
+    "define": true,
+    "require": true
+  }
+}

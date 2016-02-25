@@ -1,0 +1,39 @@
+/*
+
+FUNCTIONS
+
+*/
+
+//Create unitless number for other functions
+@function strip-unit($number) {
+  @if type-of($number)=='number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+  @return $number;
+}
+//Photoshop font sizes to relative units
+@function calculateRem($size) {
+  $remSize: $size / strip-unit($default-font-size);
+  @return #{$remSize}rem;
+}
+
+
+/*
+
+MIXINS
+
+*/
+
+@mixin fontSize($size) {
+  font-size: $size+px;
+  font-size: calculateRem($size);
+}
+
+//Just in case 
+@mixin lineHeight($font-size, $leading) {
+  line-height: $leading / $font-size;
+}
+
+@mixin kerningSize($value) {
+  letter-spacing: $value/1000+em;
+}
