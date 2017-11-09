@@ -1,55 +1,63 @@
-//var $ = require('jquery');
+// Import modules from directory
+import Common from './modules/Common';
+import Header from './modules/Header';
 
-var LMI = {
-    common: {
-        init: function() {
+// Add modules to siteScripts class
+// init module when matching 'data-module' attribute is found
+class siteScripts {
+  constructor() {
+    this.m = {
+      'common': Common,
+      'header': Header,
+    };
+  }
 
-
-        }
+  fire(modulename) {
+    if (typeof this.m[modulename] !== 'undefined') {
+      this.m[modulename].init();
     }
+  }
+
+  loadEvents() {
+    const t = this,
+      pageModules = [].slice.call(document.querySelectorAll('[data-module]')),
+      moduleNames = [];
+
+    let currentName;
+
+    if (pageModules.length) {
+      // build list of module names found and skip duplicates.
+      pageModules.forEach((mod) => {
+        currentName = mod.getAttribute('data-module');
+        if (moduleNames.indexOf(currentName) === -1) {
+          moduleNames.push(mod.getAttribute('data-module'));
+        }
+      });
+
+      // init module
+      moduleNames.forEach((classnm) => {
+        t.fire(classnm);
+      });
+
+    }
+  }
+}
+
+const domReady = (fn) => {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // If document is already loaded, run scripts
+    return fn();
+  }
+  else {
+    // Wait for document to be ready
+    document.addEventListener('DOMContentLoaded', fn, false);
+  }
 };
 
-var LMIModules = {
-    fire: function(func, funcname, args) {
-
-        var ns = LMI;
-
-        funcname = (funcname === undefined) ? 'init' : funcname;
-        if (func !== '' && ns[func] && typeof ns[func][funcname] === 'function') {
-            ns[func][funcname](args);
-        }
-    },
-
-    loadEvents: function() {
-        //fire common functions first
-        LMIModules.fire('common');
-
-        //find modules to load based on data attributes
-        var moduleTrigger = $('[data-module]');
-
-        if (moduleTrigger.length) {
-
-            var moduleNames = [];
-            var modules = [];
-
-            //find the names of each trigger
-            moduleTrigger.each(function() {
-                moduleNames.push($(this).data("module"));
-            });
-
-            //sort out duplicates
-            for (var i = 0; i < moduleNames.length; i++) {
-                if (($.inArray(moduleNames[i], modules)) === -1) {
-                    modules.push(moduleNames[i]);
-                }
-            }
-
-            //load function based on data attribute value as names
-            $.each(modules, function(i, classnm) {
-                LMIModules.fire(classnm);
-            });
-        }
-    }
-};
-
-$(document).ready(LMIModules.loadEvents);
+domReady(
+  function() {
+    const l = new siteScripts();
+    l.fire('common');
+    l.loadEvents();
+  }
+);

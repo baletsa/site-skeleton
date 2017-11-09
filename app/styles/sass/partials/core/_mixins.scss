@@ -1,39 +1,82 @@
+//
+// FUNCTIONS
+//
+
 /*
-
-FUNCTIONS
-
+//  GRID - configuration (temporarily until css grid is fully supported and implemented),
+//  Make note of uses so that progressive enhancement can be used.
 */
 
-//Create unitless number for other functions
+$grid-width: 1300px;
+$columns: 12;
+$gutter: 5%;
+// sass-lint:disable-all
+@function grid($cols, $has-gutter:false) {
+  @if $has-gutter {
+    @return calc(((100% / #{$columns}) * #{$cols}) - #{$gutter});
+  }
+  @else {
+    @return calc((100% / #{$columns}) * #{$cols});
+  }
+}
+// sass-lint:enable-all
+
+// Create unitless number for other functions
 @function strip-unit($number) {
   @if type-of($number)=='number' and not unitless($number) {
     @return $number / ($number * 0 + 1);
   }
   @return $number;
 }
-//Photoshop font sizes to relative units
-@function calculateRem($size) {
-  $remSize: $size / strip-unit($default-font-size);
-  @return #{$remSize}rem;
+
+// Photoshop font sizes to relative units
+@function calculate-rem($size) {
+  $rem-size: $size / strip-unit($default-font-size);
+  @return #{$rem-size}rem;
 }
 
-
-/*
-
-MIXINS
-
-*/
-
-@mixin fontSize($size) {
-  font-size: $size+px;
-  font-size: calculateRem($size);
+//
+// MIXINS
+//
+@mixin font-size($size) {
+  font-size: calculate-rem($size);
 }
 
-//Just in case 
-@mixin lineHeight($font-size, $leading) {
+//Just in case
+@mixin line-height($font-size, $leading) {
   line-height: $leading / $font-size;
 }
 
-@mixin kerningSize($value) {
+@mixin kerning-size($value) {
   letter-spacing: $value/1000+em;
+}
+
+//Media Queries
+@mixin phone {
+  @media (max-width: #{$screen-xs-max}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$screen-small}) and (max-width: #{$screen-medium}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$screen-medium}) {
+    @content;
+  }
+}
+
+//Button Mixin
+@mixin button-base($btn-color) {
+  //%btn default style in helpers.scss
+  @extend %btn;
+  background-color: $btn-color;
+  &:hover {
+    background-color: darken($btn-color, 5%);
+    text-decoration: none;
+  }
 }

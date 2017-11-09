@@ -1,11 +1,18 @@
 'use strict';
 
-var config = require('./config').scripts;
-var webpack = require('webpack');
-var pkg = require('../package.json');
-var date = Date();
+const config = require('./config').scripts,
+  gutil = require('gulp-util'),
+  webpack = require('webpack-stream').webpack;
 
-var banner = `
+const pkg = require('../package.json');
+
+const date = new Date();
+
+if (gutil.env.minify === true) {
+  var minify = true;
+}
+
+const banner = `
    ${pkg.name} - ${pkg.description}
    Author: ${pkg.author}
    Version: v${pkg.version}
@@ -14,51 +21,42 @@ var banner = `
    Date:  ${date}
 `;
 
-
 module.exports = {
-    cache: true,
-    entry: {
-        app: config.src,
-    },
-    output: {
-        path: config.dest,
-        publicPath: '/scripts/',
-        filename: '[name].js',
-        chunkFilename: '[name].bundle.js' // name || id || chunkhash
-    },
-    module: {
-        preLoaders: [{
-            test: /\.js$/, // include .js files
-            exclude: [/libs/, /node_modules/],
-            loader: 'jshint-loader'
-        }],
-        loaders: [{
-            test: /\.jsx?$/,
-            exclude: [/libs/, /node_modules/],
-            loader: 'babel-loader'
-        }, {
-            test: /masonry-layout/,
-            loader: 'imports?define=>false&this=>window'
-        }]
-    },
-    plugins: [
-
-        // Use this if you want to chunk shared libraries
-        // new webpack.optimize.CommonsChunkPlugin('shared.js'),
-
-        new webpack.ProvidePlugin({
-            jQuery: 'jquery',
-            $: 'jquery'
-        }),
-
-        new webpack.BannerPlugin(banner)
-
+  cache: true,
+  entry: {
+    app: config.src
+  },
+  output: {
+    publicPath: '/scripts/',
+    filename: '[name].js'
+  },
+  module: {
+    rules: [{
+        test: /\.js$/,
+        exclude: [/libs/, /node_modules/],
+        loader: "babel-loader",
+        options: {
+          presets: ["env"]
+        }
+      },
+      {
+        test: /\.js$/,
+        exclude: [/libs/, /node_modules/],
+        loader: "eslint-loader"
+      },
     ],
-
-    // Replace modules by other modules or paths.
-    // https://webpack.github.io/docs/configuration.html#resolve
-    resolve: {
-        // alias: {}
-        extensions: ['', '.js', '.es6']
-    }
+  },
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
+  devtool: 'source-map',
+  plugins: [
+    new webpack.BannerPlugin(banner),
+  ]
 };
+
+if (minify) {
+  module.exports.plugins.push(
+    new webpack.optimize.UglifyJsPlugin(config.uglifyOptions)
+  );
+}

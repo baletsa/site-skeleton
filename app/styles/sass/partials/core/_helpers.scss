@@ -1,45 +1,33 @@
-// class and settings for  
-// a responsive foundational content container
+// class and settings for a responsive foundational content container, similar to bootstrap dimensions.
+// TODO: change breakpoints to be something more fluid instead of something matching bootstrap behavior.
 .content {
   position: relative;
+  margin-right: auto;
+  margin-left: auto;
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
   @media(min-width: $screen-large) {
-    @include container(1085px);
+    max-width: $grid-width;
   }
   @media(max-width: $screen-medium-max) {
-    @include container(970px);
+    max-width: 970px;
   }
   @media(max-width: $screen-small-max) {
-    @include container(750px);
+    max-width: 750px;
   }
   @media(max-width: $screen-xs-max) {
-    @include container(100%);
+    max-width: 100%;
     padding: 0 15px;
   }
-  &:after {
-    content: '';
-    display: block;
-    clear: both;
-  }
 }
 
-%row {
-  position: relative;
-  &:after {
-    content: '';
-    display: block;
-    clear: both;
-  }
-}
-
-
-/*
-
-PLACEHOLDERS
-
-*/
-
-//remove bullets and padding from lists
-%nav-list {
-  list-style-type: none;
-  padding-left: 0;
+// Button placeholder class
+%btn {
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
 }
